@@ -3,28 +3,24 @@ import { cn } from "@/lib/utils"
 
 const cva = (base: string, config?: { variants?: Record<string, Record<string, string>>; defaultVariants?: Record<string, string> }) => {
   return (props?: Record<string, string>) => {
-    if (!config || !props) return base;
+    if (!config) return base;
     
     const { variants, defaultVariants } = config;
     let classes = base;
     
-    if (variants) {
-      Object.keys(props).forEach(key => {
-        if (variants[key] && variants[key][props[key]]) {
-          classes += ` ${variants[key][props[key]]}`;
+    // Merge props with default variants
+    const mergedProps = { ...defaultVariants, ...props };
+    
+    if (variants && mergedProps) {
+      Object.keys(mergedProps).forEach(key => {
+        const value = mergedProps[key];
+        if (variants[key] && variants[key][value]) {
+          classes += ` ${variants[key][value]}`;
         }
       });
     }
     
-    if (defaultVariants && variants) {
-      Object.keys(defaultVariants).forEach(key => {
-        if (!props[key] && variants[key] && variants[key][defaultVariants[key]]) {
-          classes += ` ${variants[key][defaultVariants[key]]}`;
-        }
-      });
-    }
-    
-    return classes;
+    return classes.trim();
   };
 };
 
@@ -68,7 +64,7 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = buttonVariants({ variant: "default" }), size = buttonVariants({ size: "default" }), ...props }, ref) => {
+  ({ className, variant = "default", size = "default", ...props }, ref) => {
     return (
       <button
         className={cn(buttonVariants({ variant, size }), className)}
