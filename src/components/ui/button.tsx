@@ -1,24 +1,22 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-type VariantProps<T> = T extends (...args: any[]) => any
-  ? { [K in keyof NonNullable<Parameters<T>[0]>]?: NonNullable<Parameters<T>[0]>[K] }
-  : never;
-
-const cva = (base: string, config?: any) => {
-  return (props?: any) => {
+const cva = (base: string, config?: { variants?: Record<string, Record<string, string>>; defaultVariants?: Record<string, string> }) => {
+  return (props?: Record<string, string>) => {
     if (!config || !props) return base;
     
     const { variants, defaultVariants } = config;
     let classes = base;
     
-    Object.keys(props).forEach(key => {
-      if (variants[key] && variants[key][props[key]]) {
-        classes += ` ${variants[key][props[key]]}`;
-      }
-    });
+    if (variants) {
+      Object.keys(props).forEach(key => {
+        if (variants[key] && variants[key][props[key]]) {
+          classes += ` ${variants[key][props[key]]}`;
+        }
+      });
+    }
     
-    if (defaultVariants) {
+    if (defaultVariants && variants) {
       Object.keys(defaultVariants).forEach(key => {
         if (!props[key] && variants[key] && variants[key][defaultVariants[key]]) {
           classes += ` ${variants[key][defaultVariants[key]]}`;
@@ -63,13 +61,14 @@ const buttonVariants = cva(
 )
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success" | "warning" | "premium"
+  size?: "default" | "sm" | "lg" | "xl" | "icon" | "icon-sm" | "icon-lg"
   asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant = buttonVariants({ variant: "default" }), size = buttonVariants({ size: "default" }), ...props }, ref) => {
     return (
       <button
         className={cn(buttonVariants({ variant, size }), className)}

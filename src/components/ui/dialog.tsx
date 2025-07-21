@@ -12,7 +12,7 @@ const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
     <>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child, { open, onOpenChange } as any);
+          return React.cloneElement(child, { open, onOpenChange } as Record<string, unknown>);
         }
         return child;
       })}
@@ -33,7 +33,7 @@ const DialogTrigger: React.FC<{
   if (React.isValidElement(children)) {
     return React.cloneElement(children, {
       onClick: handleClick,
-    } as any);
+    } as Record<string, unknown>);
   }
   
   return <button onClick={handleClick}>{children}</button>;

@@ -70,7 +70,7 @@ export const VacationRequestList: React.FC = () => {
             <h3 className="text-xl font-semibold mb-2">No vacation requests yet</h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Start planning your time off by creating your first vacation request. 
-              It's quick and easy!
+              It&apos;s quick and easy!
             </p>
             <Button 
               onClick={() => setShowCreateModal(true)}

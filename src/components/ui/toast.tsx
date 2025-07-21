@@ -38,10 +38,16 @@ export const Toast: React.FC<ToastProps> = ({
   duration = 5000,
   onRemove,
 }) => {
-  const [isVisible, setIsVisible] = React.useState(true);
   const [isRemoving, setIsRemoving] = React.useState(false);
   const variant = toastVariants[type];
   const Icon = variant.icon;
+
+  const handleRemove = React.useCallback(() => {
+    setIsRemoving(true);
+    setTimeout(() => {
+      onRemove?.(id);
+    }, 300);
+  }, [id, onRemove]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,16 +55,7 @@ export const Toast: React.FC<ToastProps> = ({
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration]);
-
-  const handleRemove = () => {
-    setIsRemoving(true);
-    setTimeout(() => {
-      onRemove?.(id);
-    }, 300);
-  };
-
-  if (!isVisible) return null;
+  }, [duration, handleRemove]);
 
   return (
     <div

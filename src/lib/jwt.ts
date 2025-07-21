@@ -52,7 +52,7 @@ export const jwt = {
   verify: async (token: string): Promise<JWTPayload | null> => {
     try {
       const { payload } = await jose.jwtVerify(token, secretKey);
-      return payload as JWTPayload;
+      return payload as unknown as JWTPayload;
     } catch {
       return null;
     }
@@ -60,7 +60,7 @@ export const jwt = {
 
   decode: (token: string): JWTPayload | null => {
     try {
-      const decoded = jose.decodeJwt(token) as JWTPayload;
+      const decoded = jose.decodeJwt(token) as unknown as JWTPayload;
       return decoded;
     } catch {
       return null;

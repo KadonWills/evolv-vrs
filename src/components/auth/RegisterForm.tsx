@@ -48,8 +48,8 @@ export const RegisterForm: React.FC = () => {
       await register(name, email, password, role);
       toast.success('Account Created', `Welcome ${name}! Your ${role} account has been created successfully.`);
       router.push(`/${role}/dashboard`);
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to create account. Please try again.';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create account. Please try again.';
       setError(errorMessage);
       toast.error('Registration Failed', errorMessage);
     }

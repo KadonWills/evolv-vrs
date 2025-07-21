@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { VacationRequest, VacationContextType } from '@/types';
 import { mockApi } from '@/lib/mockApi';
 import { useAuth } from './AuthContext';
@@ -22,7 +22,7 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [requests, setRequests] = useState<VacationRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const refreshRequests = async () => {
+  const refreshRequests = useCallback(async () => {
     if (!user) return;
     
     setIsLoading(true);
@@ -36,11 +36,11 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     refreshRequests();
-  }, [user]);
+  }, [user, refreshRequests]);
 
   const createRequest = async (requestData: Omit<VacationRequest, 'id' | 'employeeId' | 'employeeName' | 'status' | 'createdAt' | 'updatedAt'>) => {
     if (!user) throw new Error('User not authenticated');

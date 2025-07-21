@@ -73,7 +73,7 @@ export const RequestVacationModal: React.FC<RequestVacationModalProps> = ({
         reason,
       });
       handleClose();
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to create request. Please try again.');
     }
   };

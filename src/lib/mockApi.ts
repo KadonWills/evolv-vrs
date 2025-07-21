@@ -298,6 +298,6 @@ export const mockApi = {
 
 // Expose debug functions to window for browser console debugging
 if (typeof window !== 'undefined') {
-  (window as any).mockApi = mockApi;
-  (window as any).resetUsers = mockApi.resetUsers;
+  (window as typeof window & { mockApi?: typeof mockApi; resetUsers?: typeof mockApi.resetUsers }).mockApi = mockApi;
+  (window as typeof window & { mockApi?: typeof mockApi; resetUsers?: typeof mockApi.resetUsers }).resetUsers = mockApi.resetUsers;
 }

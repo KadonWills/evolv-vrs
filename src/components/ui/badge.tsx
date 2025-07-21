@@ -1,24 +1,22 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-type VariantProps<T> = T extends (...args: any[]) => any
-  ? { [K in keyof NonNullable<Parameters<T>[0]>]?: NonNullable<Parameters<T>[0]>[K] }
-  : never;
-
-const cva = (base: string, config?: any) => {
-  return (props?: any) => {
+const cva = (base: string, config?: { variants?: Record<string, Record<string, string>>; defaultVariants?: Record<string, string> }) => {
+  return (props?: Record<string, string>) => {
     if (!config || !props) return base;
     
     const { variants, defaultVariants } = config;
     let classes = base;
     
-    Object.keys(props).forEach(key => {
-      if (variants[key] && variants[key][props[key]]) {
-        classes += ` ${variants[key][props[key]]}`;
-      }
-    });
+    if (variants) {
+      Object.keys(props).forEach(key => {
+        if (variants[key] && variants[key][props[key]]) {
+          classes += ` ${variants[key][props[key]]}`;
+        }
+      });
+    }
     
-    if (defaultVariants) {
+    if (defaultVariants && variants) {
       Object.keys(defaultVariants).forEach(key => {
         if (!props[key] && variants[key] && variants[key][defaultVariants[key]]) {
           classes += ` ${variants[key][defaultVariants[key]]}`;
@@ -67,12 +65,13 @@ const badgeVariants = cva(
 )
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {
+  extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "pending" | "approved" | "rejected"
+  size?: "default" | "sm" | "lg"
   icon?: React.ReactNode;
 }
 
-function Badge({ className, variant, size, icon, children, ...props }: BadgeProps) {
+function Badge({ className, variant = "default", size = "default", icon, children, ...props }: BadgeProps) {
   return (
     <div className={cn(badgeVariants({ variant, size }), className)} {...props}>
       {icon && <span className="flex-shrink-0">{icon}</span>}

@@ -1,4 +1,4 @@
-type ClassValue = string | number | boolean | undefined | null | { [key: string]: any } | ClassValue[];
+type ClassValue = string | number | boolean | undefined | null | { [key: string]: unknown } | ClassValue[];
 
 function clsx(...inputs: ClassValue[]): string {
   const classes: string[] = [];
