@@ -10,10 +10,10 @@ import { Pagination } from '@/components/ui/pagination';
 import { FilterControls } from './FilterControls';
 import { ApprovalModal } from './ApprovalModal';
 import { useVacation } from '@/contexts/VacationContext';
-import { VacationRequest, FilterState, PaginationState } from '@/types';
+import { VacationRequest, SickLeaveRequest, FilterState, PaginationState } from '@/types';
 
 export const RequestsTable: React.FC = () => {
-  const { requests, isLoading } = useVacation();
+  const { requests, sickLeaveRequests, isLoading } = useVacation();
   const [filters, setFilters] = useState<FilterState>({ status: 'all' });
   const [pagination, setPagination] = useState<PaginationState>({
     page: 1,
@@ -21,17 +21,25 @@ export const RequestsTable: React.FC = () => {
     total: 0,
   });
   const [modalState, setModalState] = useState<{
-    request: VacationRequest | null;
+    request: VacationRequest | SickLeaveRequest | null;
+    requestType: 'vacation' | 'sickLeave' | null;
     action: 'approve' | 'reject' | null;
     open: boolean;
   }>({
     request: null,
+    requestType: null,
     action: null,
     open: false,
   });
 
   const filteredRequests = useMemo(() => {
-    let filtered = requests;
+    // Combine vacation and sick leave requests with type information
+    const allRequests = [
+      ...requests.map(req => ({ ...req, requestType: 'vacation' as const })),
+      ...sickLeaveRequests.map(req => ({ ...req, requestType: 'sickLeave' as const }))
+    ];
+
+    let filtered = allRequests;
 
     if (filters.status !== 'all') {
       filtered = filtered.filter(request => request.status === filters.status);
@@ -40,7 +48,7 @@ export const RequestsTable: React.FC = () => {
     return filtered.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  }, [requests, filters]);
+  }, [requests, sickLeaveRequests, filters]);
 
   const paginatedRequests = useMemo(() => {
     const startIndex = (pagination.page - 1) * pagination.limit;
@@ -50,9 +58,10 @@ export const RequestsTable: React.FC = () => {
 
   const totalPages = Math.ceil(filteredRequests.length / pagination.limit);
 
-  const handleApprovalAction = (request: VacationRequest, action: 'approve' | 'reject') => {
+  const handleApprovalAction = (request: VacationRequest | SickLeaveRequest, requestType: 'vacation' | 'sickLeave', action: 'approve' | 'reject') => {
     setModalState({
       request,
+      requestType,
       action,
       open: true,
     });
@@ -61,6 +70,7 @@ export const RequestsTable: React.FC = () => {
   const closeModal = () => {
     setModalState({
       request: null,
+      requestType: null,
       action: null,
       open: false,
     });
@@ -92,10 +102,10 @@ export const RequestsTable: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold text-foreground">
-            Team Vacation Requests
+            Team Time-Off Requests
           </h2>
           <p className="text-muted-foreground mt-1">
-            Review and manage vacation requests from your team
+            Review and manage vacation and sick leave requests from your team
           </p>
         </div>
         <div className="flex items-center gap-3 text-sm">
@@ -120,13 +130,13 @@ export const RequestsTable: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold mb-2">
               {filters.status === 'all' 
-                ? 'No vacation requests found' 
+                ? 'No time-off requests found' 
                 : `No ${filters.status} requests found`
               }
             </h3>
             <p className="text-muted-foreground">
               {filters.status === 'all' 
-                ? 'Team members haven\'t submitted any vacation requests yet.'
+                ? 'Team members haven\'t submitted any vacation or sick leave requests yet.'
                 : `Try adjusting your filters to see more requests.`
               }
             </p>
@@ -151,11 +161,22 @@ export const RequestsTable: React.FC = () => {
                         <CardTitle className="text-xl">
                           {request.employeeName}
                         </CardTitle>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          request.requestType === 'vacation' 
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400' 
+                            : 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-400'
+                        }`}>
+                          {request.requestType === 'vacation' ? 'Vacation' : `Sick Leave (${(request as SickLeaveRequest).type})`}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground mb-1">
                         <CalendarIcon size={16} />
                         <span className="text-sm">
-                          {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                          {request.requestType === 'vacation' ? (
+                            `${formatDate((request as VacationRequest).startDate)} - ${formatDate((request as VacationRequest).endDate)}`
+                          ) : (
+                            `${(request as SickLeaveRequest).numberOfDays} day${(request as SickLeaveRequest).numberOfDays !== 1 ? 's' : ''}`
+                          )}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground">
@@ -185,7 +206,7 @@ export const RequestsTable: React.FC = () => {
                         <Button
                           variant="success"
                           size="sm"
-                          onClick={() => handleApprovalAction(request, 'approve')}
+                          onClick={() => handleApprovalAction(request, request.requestType, 'approve')}
                           className="gap-2"
                         >
                           <CheckIcon size={16} />
@@ -194,7 +215,7 @@ export const RequestsTable: React.FC = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleApprovalAction(request, 'reject')}
+                          onClick={() => handleApprovalAction(request, request.requestType, 'reject')}
                           className="gap-2"
                         >
                           <XIcon size={16} />
@@ -227,6 +248,7 @@ export const RequestsTable: React.FC = () => {
 
       <ApprovalModal
         request={modalState.request}
+        requestType={modalState.requestType}
         action={modalState.action}
         open={modalState.open}
         onOpenChange={closeModal}

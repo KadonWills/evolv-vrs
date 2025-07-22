@@ -14,7 +14,7 @@ export const FilterControls: React.FC<FilterControlsProps> = ({
   return (
     <div className="flex gap-4 items-center">
       <div>
-        <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="status-filter" className="block text-sm font-medium text-foreground mb-1">
           Filter by Status:
         </label>
         <select

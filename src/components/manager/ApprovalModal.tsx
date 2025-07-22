@@ -12,10 +12,11 @@ import {
 } from '@/components/ui/dialog';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { useVacation } from '@/contexts/VacationContext';
-import { VacationRequest } from '@/types';
+import { VacationRequest, SickLeaveRequest } from '@/types';
 
 interface ApprovalModalProps {
-  request: VacationRequest | null;
+  request: VacationRequest | SickLeaveRequest | null;
+  requestType: 'vacation' | 'sickLeave' | null;
   action: 'approve' | 'reject' | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -23,13 +24,20 @@ interface ApprovalModalProps {
 
 export const ApprovalModal: React.FC<ApprovalModalProps> = ({
   request,
+  requestType,
   action,
   open,
   onOpenChange,
 }) => {
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
-  const { approveRequest, rejectRequest, isLoading } = useVacation();
+  const { 
+    approveRequest, 
+    rejectRequest, 
+    approveSickLeaveRequest, 
+    rejectSickLeaveRequest, 
+    isLoading 
+  } = useVacation();
 
   const resetForm = () => {
     setComment('');
@@ -45,7 +53,7 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
     e.preventDefault();
     setError('');
 
-    if (!request || !action) return;
+    if (!request || !action || !requestType) return;
 
     if (action === 'reject' && !comment.trim()) {
       setError('A comment is required when rejecting a request');
@@ -53,10 +61,19 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
     }
 
     try {
-      if (action === 'approve') {
-        await approveRequest(request.id, comment.trim() || undefined);
+      if (requestType === 'vacation') {
+        if (action === 'approve') {
+          await approveRequest(request.id, comment.trim() || undefined);
+        } else {
+          await rejectRequest(request.id, comment.trim());
+        }
       } else {
-        await rejectRequest(request.id, comment.trim());
+        // Sick leave request
+        if (action === 'approve') {
+          await approveSickLeaveRequest(request.id, comment.trim() || undefined);
+        } else {
+          await rejectSickLeaveRequest(request.id, comment.trim());
+        }
       }
       handleClose();
     } catch {
@@ -68,23 +85,30 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
     return new Date(dateString).toLocaleDateString();
   };
 
-  if (!request || !action) return null;
+  if (!request || !action || !requestType) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {action === 'approve' ? 'Approve' : 'Reject'} Vacation Request
+            {action === 'approve' ? 'Approve' : 'Reject'} {requestType === 'vacation' ? 'Vacation' : 'Sick Leave'} Request
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-md">
-            <h4 className="font-medium text-sm text-gray-700 mb-2">Request Details:</h4>
+          <div className="bg-muted/30 p-4 rounded-md">
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">Request Details:</h4>
             <div className="space-y-1 text-sm">
               <p><strong>Employee:</strong> {request.employeeName}</p>
-              <p><strong>Dates:</strong> {formatDate(request.startDate)} - {formatDate(request.endDate)}</p>
+              {requestType === 'vacation' ? (
+                <p><strong>Dates:</strong> {formatDate((request as VacationRequest).startDate)} - {formatDate((request as VacationRequest).endDate)}</p>
+              ) : (
+                <>
+                  <p><strong>Type:</strong> {(request as SickLeaveRequest).type}</p>
+                  <p><strong>Duration:</strong> {(request as SickLeaveRequest).numberOfDays} day{(request as SickLeaveRequest).numberOfDays !== 1 ? 's' : ''}</p>
+                </>
+              )}
               <p><strong>Reason:</strong> {request.reason}</p>
             </div>
           </div>
@@ -97,7 +121,7 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
             )}
 
             <div>
-              <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="comment" className="block text-sm font-medium text-foreground mb-1">
                 {action === 'reject' ? 'Rejection Reason (Required)' : 'Comment (Optional)'}
               </label>
               <Textarea
