@@ -67,7 +67,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
       try {
         await updateRequestReason(request.id, reason);
         handleClose();
-      } catch (_err) {
+      } catch {
         setError('Failed to update reason. Please try again.');
       }
       return;
@@ -101,7 +101,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
         reason,
       });
       handleClose();
-    } catch (_err) {
+    } catch {
       setError('Failed to update request. Please try again.');
     }
   };

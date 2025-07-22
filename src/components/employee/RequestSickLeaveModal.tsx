@@ -69,7 +69,7 @@ export const RequestSickLeaveModal: React.FC<RequestSickLeaveModalProps> = ({
         numberOfDays: days,
       });
       handleClose();
-    } catch (_err) {
+    } catch {
       setError('Failed to create sick leave request. Please try again.');
     }
   };

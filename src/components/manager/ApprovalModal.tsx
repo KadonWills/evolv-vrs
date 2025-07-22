@@ -59,7 +59,7 @@ export const ApprovalModal: React.FC<ApprovalModalProps> = ({
         await rejectRequest(request.id, comment.trim());
       }
       handleClose();
-    } catch (_err) {
+    } catch {
       setError(`Failed to ${action} request. Please try again.`);
     }
   };

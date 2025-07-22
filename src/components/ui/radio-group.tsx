@@ -14,6 +14,8 @@ export interface RadioGroupItemProps {
   id?: string;
   children: React.ReactNode;
   className?: string;
+  checked?: boolean;
+  onSelect?: () => void;
 }
 
 const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
@@ -54,10 +56,7 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
 
 RadioGroup.displayName = 'RadioGroup';
 
-const RadioGroupItem = React.forwardRef<HTMLDivElement, RadioGroupItemProps & {
-  checked?: boolean;
-  onSelect?: () => void;
-}>(({ value, id, children, className = '', checked, onSelect }, ref) => {
+const RadioGroupItem = React.forwardRef<HTMLDivElement, RadioGroupItemProps>(({ value, id, children, className = '', checked, onSelect }, ref) => {
   const itemId = id || `radio-${value}`;
 
   return (
