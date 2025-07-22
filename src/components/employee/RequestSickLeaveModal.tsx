@@ -97,7 +97,7 @@ export const RequestSickLeaveModal: React.FC<RequestSickLeaveModalProps> = ({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
               Reason (minimum 10 characters)
             </label>
             <Textarea
@@ -113,7 +113,7 @@ export const RequestSickLeaveModal: React.FC<RequestSickLeaveModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
               Type
             </label>
             <RadioGroup 
@@ -133,7 +133,7 @@ export const RequestSickLeaveModal: React.FC<RequestSickLeaveModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="numberOfDays" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
               Number of Days
             </label>
             <Select

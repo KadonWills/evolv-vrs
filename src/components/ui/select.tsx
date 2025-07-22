@@ -63,6 +63,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white 
             placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
             disabled:cursor-not-allowed disabled:opacity-50
+            dark:border-gray-600 dark:bg-gray-800 dark:text-slate-200 dark:placeholder:text-gray-400 dark:ring-offset-gray-800 dark:focus:ring-blue-400
             ${className}
           `}
           onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -70,7 +71,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           aria-haspopup="listbox"
           aria-expanded={isOpen}
         >
-          <span className={selectedValue ? 'text-gray-900' : 'text-gray-500'}>
+          <span className={selectedValue ? 'text-gray-900 dark:text-slate-200' : 'text-gray-500 dark:text-gray-400'}>
             {getSelectedLabel()}
           </span>
           <svg
@@ -84,7 +85,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         </button>
 
         {isOpen && (
-          <div className="absolute top-full z-50 mt-1 w-full rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+          <div className="absolute top-full z-50 mt-1 w-full rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-800">
             {React.Children.map(children, (child) => {
               if (React.isValidElement<SelectItemProps>(child)) {
                 return (
@@ -93,7 +94,10 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                     type="button"
                     className={`
                       w-full px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none
-                      ${child.props.value === selectedValue ? 'bg-blue-50 text-blue-600' : 'text-gray-900'}
+                      dark:hover:bg-gray-700 dark:focus:bg-gray-700
+                      ${child.props.value === selectedValue 
+                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400' 
+                        : 'text-gray-900 dark:text-slate-200'}
                     `}
                     onClick={() => handleSelect(child.props.value)}
                   >

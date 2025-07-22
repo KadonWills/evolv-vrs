@@ -93,7 +93,7 @@ export const RequestVacationModal: React.FC<RequestVacationModalProps> = ({
           )}
 
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
               Start Date
             </label>
             <Input
@@ -106,7 +106,7 @@ export const RequestVacationModal: React.FC<RequestVacationModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
               End Date
             </label>
             <Input
@@ -119,7 +119,7 @@ export const RequestVacationModal: React.FC<RequestVacationModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="reason" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
               Reason (minimum 10 characters)
             </label>
             <Textarea

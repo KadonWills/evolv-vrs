@@ -74,8 +74,8 @@ const RadioGroupItem = React.forwardRef<HTMLDivElement, RadioGroupItemProps & {
         className={`
           w-4 h-4 rounded-full border-2 flex items-center justify-center cursor-pointer transition-colors
           ${checked 
-            ? 'border-blue-600 bg-blue-600' 
-            : 'border-gray-300 hover:border-gray-400 bg-white'
+            ? 'border-blue-600 bg-blue-600 dark:border-blue-500 dark:bg-blue-500' 
+            : 'border-gray-300 hover:border-gray-400 bg-white dark:border-gray-600 dark:hover:border-gray-500 dark:bg-gray-800'
           }
         `}
       >
@@ -85,7 +85,7 @@ const RadioGroupItem = React.forwardRef<HTMLDivElement, RadioGroupItemProps & {
       </button>
       <label
         htmlFor={itemId}
-        className="text-sm font-medium text-gray-700 cursor-pointer"
+        className="text-sm font-medium text-gray-700 dark:text-slate-200 cursor-pointer"
       >
         {children}
       </label>
