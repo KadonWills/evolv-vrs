@@ -60,10 +60,9 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           ref={ref}
           type="button"
           className={`
-            flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white 
-            placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+            flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background 
+            placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 
             disabled:cursor-not-allowed disabled:opacity-50
-            dark:border-gray-600 dark:bg-gray-800 dark:text-slate-200 dark:placeholder:text-gray-400 dark:ring-offset-gray-800 dark:focus:ring-blue-400
             ${className}
           `}
           onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -71,7 +70,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           aria-haspopup="listbox"
           aria-expanded={isOpen}
         >
-          <span className={selectedValue ? 'text-gray-900 dark:text-slate-200' : 'text-gray-500 dark:text-gray-400'}>
+          <span className={selectedValue ? 'text-foreground' : 'text-muted-foreground'}>
             {getSelectedLabel()}
           </span>
           <svg
@@ -85,7 +84,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         </button>
 
         {isOpen && (
-          <div className="absolute top-full z-50 mt-1 w-full rounded-md border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-600 dark:bg-gray-800">
+          <div className="absolute top-full z-50 mt-1 w-full rounded-md border border-border bg-popover py-1 shadow-lg">
             {React.Children.map(children, (child) => {
               if (React.isValidElement<SelectItemProps>(child)) {
                 return (
@@ -93,11 +92,10 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                     key={child.props.value}
                     type="button"
                     className={`
-                      w-full px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none
-                      dark:hover:bg-gray-700 dark:focus:bg-gray-700
+                      w-full px-3 py-2 text-left text-sm hover:bg-accent focus:bg-accent focus:outline-none
                       ${child.props.value === selectedValue 
-                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400' 
-                        : 'text-gray-900 dark:text-slate-200'}
+                        ? 'bg-accent text-accent-foreground' 
+                        : 'text-popover-foreground'}
                     `}
                     onClick={() => handleSelect(child.props.value)}
                   >

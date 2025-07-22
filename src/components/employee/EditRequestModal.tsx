@@ -145,7 +145,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
             {editMode === 'full' && (
               <>
                 <div>
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
+                  <label htmlFor="startDate" className="block text-sm font-medium text-foreground mb-1">
                     Start Date
                   </label>
                   <Input
@@ -158,7 +158,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
+                  <label htmlFor="endDate" className="block text-sm font-medium text-foreground mb-1">
                     End Date
                   </label>
                   <Input
@@ -173,7 +173,7 @@ export const EditRequestModal: React.FC<EditRequestModalProps> = ({
             )}
 
             <div>
-              <label htmlFor="reason" className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-1">
+              <label htmlFor="reason" className="block text-sm font-medium text-foreground mb-1">
                 Reason (minimum 10 characters)
               </label>
               <Textarea

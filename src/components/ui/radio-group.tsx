@@ -84,7 +84,7 @@ const RadioGroupItem = React.forwardRef<HTMLDivElement, RadioGroupItemProps>(({ 
       </button>
       <label
         htmlFor={itemId}
-        className="text-sm font-medium text-gray-700 dark:text-slate-200 cursor-pointer"
+        className="text-sm font-medium text-foreground cursor-pointer"
       >
         {children}
       </label>
