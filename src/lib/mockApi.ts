@@ -1,9 +1,10 @@
-import { User, VacationRequest } from '@/types';
+import { User, VacationRequest, SickLeaveRequest } from '@/types';
 import { jwt } from './jwt';
 
 const STORAGE_KEYS = {
   AUTH_TOKEN: 'vrs_auth_token',
   REQUESTS: 'vrs_requests',
+  SICK_LEAVE_REQUESTS: 'vrs_sick_leave_requests',
   USERS: 'vrs_users',
 };
 
@@ -45,6 +46,17 @@ const getStoredRequests = (): VacationRequest[] => {
 const storeRequests = (requests: VacationRequest[]) => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.REQUESTS, JSON.stringify(requests));
+};
+
+const getStoredSickLeaveRequests = (): SickLeaveRequest[] => {
+  if (typeof window === 'undefined') return [];
+  const stored = localStorage.getItem(STORAGE_KEYS.SICK_LEAVE_REQUESTS);
+  return stored ? JSON.parse(stored) : [];
+};
+
+const storeSickLeaveRequests = (requests: SickLeaveRequest[]) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STORAGE_KEYS.SICK_LEAVE_REQUESTS, JSON.stringify(requests));
 };
 
 const getStoredUsers = (): User[] => {
@@ -293,6 +305,84 @@ export const mockApi = {
       email: payload.email,
       role: payload.role
     }, '24h');
+  },
+
+  // Sick Leave Request Methods
+  async getSickLeaveRequests(userId?: string): Promise<SickLeaveRequest[]> {
+    await delay(600);
+    
+    const requests = getStoredSickLeaveRequests();
+    return userId ? requests.filter(r => r.employeeId === userId) : requests;
+  },
+
+  async createSickLeaveRequest(request: Omit<SickLeaveRequest, 'id' | 'employeeId' | 'employeeName' | 'status' | 'createdAt' | 'updatedAt'>, user: User): Promise<SickLeaveRequest> {
+    await delay(700);
+    
+    const newRequest: SickLeaveRequest = {
+      ...request,
+      id: generateId(),
+      employeeId: user.id,
+      employeeName: user.name,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    const requests = getStoredSickLeaveRequests();
+    requests.push(newRequest);
+    storeSickLeaveRequests(requests);
+    
+    return newRequest;
+  },
+
+  async deleteSickLeaveRequest(id: string): Promise<void> {
+    await delay(500);
+    
+    const requests = getStoredSickLeaveRequests();
+    const filteredRequests = requests.filter(r => r.id !== id);
+    storeSickLeaveRequests(filteredRequests);
+  },
+
+  async approveSickLeaveRequest(id: string, comment?: string): Promise<SickLeaveRequest> {
+    await delay(600);
+    
+    const requests = getStoredSickLeaveRequests();
+    const index = requests.findIndex(r => r.id === id);
+    
+    if (index === -1) {
+      throw new Error('Sick leave request not found');
+    }
+    
+    requests[index] = {
+      ...requests[index],
+      status: 'approved',
+      managerComment: comment,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storeSickLeaveRequests(requests);
+    return requests[index];
+  },
+
+  async rejectSickLeaveRequest(id: string, comment: string): Promise<SickLeaveRequest> {
+    await delay(600);
+    
+    const requests = getStoredSickLeaveRequests();
+    const index = requests.findIndex(r => r.id === id);
+    
+    if (index === -1) {
+      throw new Error('Sick leave request not found');
+    }
+    
+    requests[index] = {
+      ...requests[index],
+      status: 'rejected',
+      managerComment: comment,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    storeSickLeaveRequests(requests);
+    return requests[index];
   },
 };
 

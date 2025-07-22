@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { VacationRequest, VacationContextType } from '@/types';
+import { VacationRequest, SickLeaveRequest, VacationContextType } from '@/types';
 import { mockApi } from '@/lib/mockApi';
 import { useAuth } from './AuthContext';
 import { useToastContext } from './ToastContext';
@@ -20,6 +20,7 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { user } = useAuth();
   const toast = useToastContext();
   const [requests, setRequests] = useState<VacationRequest[]>([]);
+  const [sickLeaveRequests, setSickLeaveRequests] = useState<SickLeaveRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const refreshRequests = useCallback(async () => {
@@ -27,10 +28,12 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setIsLoading(true);
     try {
-      const fetchedRequests = await mockApi.getRequests(
-        user.role === 'employee' ? user.id : undefined
-      );
+      const [fetchedRequests, fetchedSickLeaveRequests] = await Promise.all([
+        mockApi.getRequests(user.role === 'employee' ? user.id : undefined),
+        mockApi.getSickLeaveRequests(user.role === 'employee' ? user.id : undefined)
+      ]);
       setRequests(fetchedRequests);
+      setSickLeaveRequests(fetchedSickLeaveRequests);
     } catch (error) {
       console.error('Failed to fetch requests:', error);
     } finally {
@@ -118,15 +121,78 @@ export const VacationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const createSickLeaveRequest = async (requestData: Omit<SickLeaveRequest, 'id' | 'employeeId' | 'employeeName' | 'status' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) throw new Error('User not authenticated');
+    
+    setIsLoading(true);
+    try {
+      const newRequest = await mockApi.createSickLeaveRequest(requestData, user);
+      setSickLeaveRequests(prev => [...prev, newRequest]);
+      toast.success('Request Created', 'Your sick leave request has been submitted successfully.');
+    } catch (error) {
+      toast.error('Creation Failed', 'Unable to create sick leave request. Please try again.');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteSickLeaveRequest = async (id: string) => {
+    setIsLoading(true);
+    try {
+      await mockApi.deleteSickLeaveRequest(id);
+      setSickLeaveRequests(prev => prev.filter(req => req.id !== id));
+      toast.success('Request Cancelled', 'Your sick leave request has been cancelled successfully.');
+    } catch (error) {
+      toast.error('Cancellation Failed', 'Unable to cancel sick leave request. Please try again.');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const approveSickLeaveRequest = async (id: string, comment?: string) => {
+    setIsLoading(true);
+    try {
+      const updatedRequest = await mockApi.approveSickLeaveRequest(id, comment);
+      setSickLeaveRequests(prev => prev.map(req => req.id === id ? updatedRequest : req));
+      toast.success('Request Approved', `Sick leave request for ${updatedRequest.employeeName} has been approved.`);
+    } catch (error) {
+      toast.error('Approval Failed', 'Unable to approve sick leave request. Please try again.');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const rejectSickLeaveRequest = async (id: string, comment: string) => {
+    setIsLoading(true);
+    try {
+      const updatedRequest = await mockApi.rejectSickLeaveRequest(id, comment);
+      setSickLeaveRequests(prev => prev.map(req => req.id === id ? updatedRequest : req));
+      toast.success('Request Rejected', `Sick leave request for ${updatedRequest.employeeName} has been rejected.`);
+    } catch (error) {
+      toast.error('Rejection Failed', 'Unable to reject sick leave request. Please try again.');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: VacationContextType = {
     requests,
+    sickLeaveRequests,
     isLoading,
     createRequest,
+    createSickLeaveRequest,
     updateRequest,
     updateRequestReason,
     deleteRequest,
+    deleteSickLeaveRequest,
     approveRequest,
     rejectRequest,
+    approveSickLeaveRequest,
+    rejectSickLeaveRequest,
     refreshRequests,
   };
 
